@@ -83,6 +83,8 @@
 - [ ] 6.Buyer profile (include the purchase history as a part of the buyer profile)
 	- [ ] `GET /api/buyer/profile`
 
+Note : Should have option to make a complaint
+
 ---
 
 - [ ] Sellers
@@ -98,6 +100,7 @@
 - [ ] 3. Inventory Management
 	- [ ] **PATCH `/api/seller/products/:id/stock`** 
 - [ ] 4. Seller analytics (Bestselling products, daily/weekly/monthly/yearly earnings etc.) #conflicts
+		Can develop after complete main functionalities
 - [ ] 5.Order Management 
 	- [ ] **GET `/api/seller/orders`**
 	- [ ] **PUT `/api/seller/orders/:id`**  
@@ -109,6 +112,8 @@
 	- [ ] **GET `/api/seller/messages`**
 	- [ ] **POST `/api/seller/messages/:id/reply`** 
 - [ ] 9. Returns & Refunds  #conflicts
+
+Note : Should have option to visible complaints response about return and refund
 
 
 
