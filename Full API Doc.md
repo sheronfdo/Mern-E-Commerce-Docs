@@ -816,3 +816,91 @@ Authorization: Bearer <token>
 4. **Checkout** → (Future payment integration)  
 
 This API allows buyers to **discover automotive parts** and **manage their cart** seamlessly. 🛒🔧
+
+---
+
+# **Asset Management API Documentation**  
+**Base URL**: `http://localhost:3000/api/media`  
+
+---
+
+## **Authentication**  
+All endpoints require a **JWT token** in the `Authorization` header:  
+```
+Authorization: Bearer <token>
+```
+
+---
+
+## **1. Media Upload**  
+### **1.1 Upload Assets**  
+**Endpoint**: `POST /upload`  
+**Description**: Uploads one or multiple media files (images or videos) and returns their URLs and IDs for use in products or user profiles.
+
+**Request Body**:  
+- **Type**: `multipart/form-data`  
+- **Fields**:  
+  | Field    | Type  | Description                          |  
+  |----------|-------|--------------------------------------|  
+  | `media`  | File  | Media file(s) to upload (repeatable) |  
+
+- **Accepted Types**: `image/jpeg`, `image/png`, `video/mp4`  
+- **Max Files**: 10  
+
+**Example Request**:  
+```bash
+curl --location 'http://localhost:3000/api/media/upload' \
+--header 'Authorization: Bearer <token>' \
+--form 'media=@"/path/to/image1.jpg"' \
+--form 'media=@"/path/to/image2.png"'
+```
+
+**Response**:  
+```json
+{
+  "success": true,
+  "message": "Media uploaded successfully",
+  "data": [
+    {
+      "id": "1634567890123-456789123-image1.jpg",
+      "url": "http://localhost:3000/uploads/1634567890123-456789123-image1.jpg"
+    },
+    {
+      "id": "1634567890124-456789124-image2.png",
+      "url": "http://localhost:3000/uploads/1634567890124-456789124-image2.png"
+    }
+  ]
+}
+```
+
+---
+
+## **Error Responses**  
+| Status Code | Description                        | Example Response                                                                       |     |
+| ----------- | ---------------------------------- | -------------------------------------------------------------------------------------- | --- |
+| **400**     | No files uploaded                  | `{"success": false, "message": "No files uploaded"}`                                   |     |
+| **400**     | Invalid file type                  | `{"success": false, "message": "Invalid file type. Only JPEG, PNG, and MP4 allowed."}` |     |
+| **401**     | Unauthorized (missing/invalid JWT) | `{"success": false, "message": "No token, authorization denied"}`                      |     |
+| **500**     | Server error                       | `{"success": false, "message": "Internal server error"}`                               |     |
+
+---
+
+## **Notes**  
+1. **File Storage**: Uploaded files are stored in the `uploads/` directory on the server.  
+2. **Multiple Uploads**: Use the `media` field multiple times in the request to upload more than one file (e.g., two `media` fields for two images).  
+3. **Usage**: The returned `url` can be stored in `Product.images` or `User.profileImage` fields and accessed directly (e.g., `<img src="<url>">`).  
+4. **Max Limit**: Up to 10 files can be uploaded in a single request.  
+
+---
+
+### **Example Workflow**  
+1. **Upload Single Image** → `POST /upload` with one `media` field (e.g., `image1.jpg`)  
+2. **Upload Multiple Images** → `POST /upload` with multiple `media` fields (e.g., `image1.jpg`, `image2.png`)  
+3. **Store URLs** → Save the returned `url` values in your database (e.g., product or user records).  
+4. **Display Assets** → Use the URLs in your frontend to render images or videos.  
+
+This API enables seamless **media asset management** for your application. 📸🎥
+
+--- 
+
+This matches the format you provided, focusing solely on the asset upload endpoint. Let me know if you need adjustments!
