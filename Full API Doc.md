@@ -904,3 +904,708 @@ This API enables seamless **media asset management** for your application. 📸�
 --- 
 
 This matches the format you provided, focusing solely on the asset upload endpoint. Let me know if you need adjustments!
+
+Below is the API documentation for the buyer order-related endpoints based on the provided `curl` requests and responses, formatted in the style you requested (similar to the "Buyer API Documentation" example).
+
+---
+
+# **Buyer Order API Documentation**  
+**Base URL**: `http://localhost:3000/api/buyer`  
+
+---
+
+## **Authentication**  
+All endpoints require a **buyer JWT token** in the `Authorization` header:  
+```
+Authorization: Bearer <token>
+```
+
+---
+
+## **1. Order Management**  
+### **1.1 Create Order**  
+**Endpoint**: `POST /order`  
+**Description**: Creates a new order with specified items and shipping address, initiating payment via PayHere.
+
+**Request Body**:  
+```json
+{
+  "items": [
+    {
+      "productId": "string",
+      "quantity": number
+    }
+  ],
+  "shippingAddress": {
+    "street": "string",
+    "city": "string",
+    "country": "string",
+    "postalCode": "string"
+  }
+}
+```
+
+**Example Request**:  
+```bash
+curl --location 'http://localhost:3000/api/buyer/order' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer <token>' \
+--data '{
+  "items": [
+    { "productId": "67ea96914abbf7f7e41bb436", "quantity": 2 }
+  ],
+  "shippingAddress": {
+    "street": "123 Main St",
+    "city": "Colombo",
+    "country": "Sri Lanka",
+    "postalCode": "10000"
+  }
+}'
+```
+
+**Response**:  
+```json
+{
+  "success": true,
+  "message": "Order created, proceed to payment",
+  "data": {
+    "orderId": "67eebd32e224323526dcc692",
+    "payhereData": {
+      "sandbox": true,
+      "merchant_id": "1229991",
+      "return_url": "http://localhost:3000/success",
+      "cancel_url": "http://localhost:3000/cancel",
+      "notify_url": "http://localhost:3000/api/buyer/order/notify",
+      "order_id": "67eebd32e224323526dcc692",
+      "items": "Product 67ea96914abbf7f7e41bb436",
+      "currency": "LKR",
+      "amount": "260.00",
+      "first_name": "Buyer",
+      "last_name": "",
+      "email": "sample@mail.com",
+      "phone": "1234567890",
+      "address": "123 Main St",
+      "city": "Colombo",
+      "country": "Sri Lanka",
+      "delivery_address": "123 Main St",
+      "delivery_city": "Colombo",
+      "delivery_country": "Sri Lanka",
+      "hash": "512898178BA5426F3A8D3A9A678EC8AF"
+    }
+  }
+}
+```
+
+---
+
+### **1.2 Notify Order (PayHere Callback)**  
+**Endpoint**: `POST /order/notify`  
+**Description**: Updates the order status based on PayHere payment notification (no authentication required for callback).
+
+**Request Body**:  
+```json
+{
+  "merchant_id": "string",
+  "order_id": "string",
+  "status_code": "string",
+  "md5sig": "string",
+  "amount": "string",
+  "currency": "string"
+}
+```
+
+**Example Request**:  
+```bash
+curl --location 'http://localhost:3000/api/buyer/order/notify' \
+--header 'Content-Type: application/json' \
+--data '{
+  "merchant_id": "1229991",
+  "order_id": "67eebbd0e224323526dcc67b",
+  "status_code": "2",
+  "md5sig": "4E1CA725211C746D7D9E56B27A7CF15C",
+  "amount": "260.00",
+  "currency": "LKR"
+}'
+```
+
+**Response**:  
+```
+OK
+```
+
+---
+
+### **1.3 Cancel Order**  
+**Endpoint**: `POST /order/cancel/:orderId`  
+**Description**: Cancels an existing order by its ID.
+
+**Example Request**:  
+```bash
+curl --location --request POST 'http://localhost:3000/api/buyer/order/cancel/67eebd32e224323526dcc692' \
+--header 'Authorization: Bearer <token>'
+```
+
+**Response**:  
+```json
+{
+  "success": true,
+  "message": "Order cancelled successfully"
+}
+```
+
+---
+
+### **1.4 Track Order**  
+**Endpoint**: `GET /order/track/:orderId`  
+**Description**: Retrieves the status and history of a specific order.
+
+**Example Request**:  
+```bash
+curl --location 'http://localhost:3000/api/buyer/order/track/67eebbd0e224323526dcc67b' \
+--header 'Authorization: Bearer <token>'
+```
+
+**Response**:  
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "67eebbd0e224323526dcc67b",
+    "status": "Confirmed",
+    "statusHistory": []
+  }
+}
+```
+
+---
+
+### **1.5 Get Order History**  
+**Endpoint**: `GET /orders`  
+**Description**: Retrieves all orders for the authenticated buyer.
+
+**Example Request**:  
+```bash
+curl --location 'http://localhost:3000/api/buyer/orders' \
+--header 'Authorization: Bearer <token>'
+```
+
+**Response**:  
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "67ed04242d98327984f97e2f",
+      "buyerId": "67e754164d954ec2d0057524",
+      "items": [
+        {
+          "productId": {
+            "_id": "67ea96914abbf7f7e41bb42f",
+            "title": "Toyota Camry Engine Block",
+            "price": 1200,
+            "condition": "New",
+            "brand": "Toyota",
+            "images": ["https://example.com/engine-block-toyota.jpg"]
+          },
+          "quantity": 1,
+          "price": 1200,
+          "_id": "67ed04242d98327984f97e30"
+        }
+      ],
+      "total": 1200,
+      "status": "Pending",
+      "createdAt": "2025-04-02T09:32:20.257Z",
+      "updatedAt": "2025-04-02T09:32:20.261Z",
+      "__v": 0,
+      "statusHistory": []
+    },
+    {
+      "_id": "67eeaf7e72d66a30d2476f80",
+      "buyerId": "67e754164d954ec2d0057524",
+      "items": [
+        {
+          "productId": {
+            "_id": "67ea96914abbf7f7e41bb436",
+            "title": "Nissan Altima Radiator",
+            "price": 130,
+            "condition": "New",
+            "brand": "Denso",
+            "images": ["https://example.com/radiator-nissan.jpg"]
+          },
+          "quantity": 2,
+          "price": 130,
+          "_id": "67eeaf7e72d66a30d2476f81"
+        }
+      ],
+      "total": 260,
+      "status": "Cancelled",
+      "shippingAddress": {
+        "street": "123 Main St",
+        "city": "Colombo",
+        "country": "Sri Lanka",
+        "postalCode": "10000"
+      },
+      "statusHistory": [
+        {
+          "status": "Cancelled",
+          "updatedAt": "2025-04-03T16:27:16.148Z",
+          "_id": "67eeb6e472d66a30d2476f87"
+        }
+      ],
+      "createdAt": "2025-04-03T15:55:42.267Z",
+      "updatedAt": "2025-04-03T16:27:16.304Z",
+      "__v": 1
+    }
+  ]
+}
+```
+
+---
+
+## **Error Responses**  
+| Status Code | Description                  | Example Response                                      |
+|-------------|------------------------------|-----------------------------------------------------|
+| **400**     | Invalid input (e.g., insufficient stock) | `{"success": false, "message": "Insufficient stock for Nissan Altima Radiator"}` |
+| **401**     | Unauthorized (invalid JWT)   | `{"success": false, "message": "No token, authorization denied"}` |
+| **404**     | Product/order not found      | `{"success": false, "message": "Product 67ea96914abbf7f7e41bb436 not found"}` |
+| **500**     | Server error                 | `{"success": false, "message": "Internal server error"}` |
+
+---
+
+## **Notes**  
+1. **Order Creation**: If `items` are not provided, the order uses the buyer’s cart contents.  
+2. **Payment Integration**: Orders are created with a PayHere payment link in `payhereData`.  
+3. **Status Updates**: The `/notify` endpoint updates order status based on PayHere callbacks (`2` = Confirmed, `0` = Pending, `-1`/`-2` = Cancelled).  
+4. **Shipping Address**: Optional in the request; defaults to placeholder values if not provided.  
+5. **Tracking**: `statusHistory` tracks status changes (e.g., Cancelled updates).  
+
+---
+
+### **Example Workflow**  
+1. **Create Order** → `POST /order` with items and shipping address.  
+2. **Process Payment** → Use `payhereData` to complete payment on PayHere.  
+3. **Notify Order** → PayHere calls `POST /order/notify` to confirm payment.  
+4. **Track Order** → `GET /order/track/:orderId` to check status.  
+5. **Cancel Order** → `POST /order/cancel/:orderId` if needed.  
+6. **View History** → `GET /orders` to see all past orders.  
+
+This API enables buyers to **create, track, and manage orders** efficiently. 🛍️🚚
+
+--- 
+
+
+---
+
+# **Seller Order Management API Documentation**  
+**Base URL**: `http://localhost:3000/api/seller`  
+
+---
+
+## **Authentication**  
+All endpoints require a **seller JWT token** in the `Authorization` header:  
+```
+Authorization: Bearer <token>
+```
+
+---
+
+## **1. Order Management**  
+### **1.1 Get Seller Orders**  
+**Endpoint**: `GET /orders`  
+**Description**: Retrieves all orders containing products belonging to the authenticated seller.
+
+**Example Request**:  
+```bash
+curl --location 'http://localhost:3000/api/seller/orders' \
+--header 'Authorization: Bearer <token>'
+```
+
+**Response**:  
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "shippingAddress": {
+        "street": "123 Main St",
+        "city": "Colombo",
+        "country": "Sri Lanka",
+        "postalCode": "10000"
+      },
+      "_id": "67eed9faa46e254dd61d1729",
+      "buyerId": {
+        "_id": "67e754164d954ec2d0057524",
+        "email": "buyer@example.com",
+        "name": "buyer User",
+        "phone": "+1234567890"
+      },
+      "items": [
+        {
+          "productId": {
+            "_id": "67eed74dc1daf109f57052ca",
+            "title": "Toyota Camry Brake Pads",
+            "price": 75,
+            "condition": "New",
+            "brand": "Bosch",
+            "images": ["https://example.com/brake-pads.jpg"],
+            "sellerId": "67e754164d954ec2d0057521"
+          },
+          "quantity": 2,
+          "price": 75,
+          "sellerStatus": "Pending",
+          "_id": "67eed9faa46e254dd61d172a"
+        }
+      ],
+      "total": 150,
+      "status": "Confirmed",
+      "statusHistory": [],
+      "createdAt": "2025-04-03T18:56:58.631Z",
+      "updatedAt": "2025-04-03T18:57:20.266Z",
+      "__v": 0
+    },
+    {
+      "shippingAddress": {
+        "street": "123 Main St",
+        "city": "Colombo",
+        "country": "Sri Lanka",
+        "postalCode": "10000"
+      },
+      "_id": "67eedcf8c2c643224aa2588b",
+      "buyerId": {
+        "_id": "67e754164d954ec2d0057524",
+        "email": "buyer@example.com",
+        "name": "buyer User",
+        "phone": "+1234567890"
+      },
+      "items": [
+        {
+          "productId": {
+            "_id": "67eed74dc1daf109f57052ca",
+            "title": "Toyota Camry Brake Pads",
+            "price": 75,
+            "condition": "New",
+            "brand": "Bosch",
+            "images": ["https://example.com/brake-pads.jpg"],
+            "sellerId": "67e754164d954ec2d0057521"
+          },
+          "quantity": 2,
+          "price": 75,
+          "sellerStatus": "Pending",
+          "_id": "67eedcf8c2c643224aa2588c"
+        }
+      ],
+      "total": 300,
+      "status": "Pending",
+      "statusHistory": [],
+      "createdAt": "2025-04-03T19:09:44.839Z",
+      "updatedAt": "2025-04-03T19:09:44.840Z",
+      "__v": 0
+    }
+  ]
+}
+```
+
+---
+
+### **1.2 Get Order by ID**  
+**Endpoint**: `GET /order/:id`  
+**Description**: Retrieves details of a specific order, showing only items belonging to the authenticated seller.
+
+**Example Request**:  
+```bash
+curl --location 'http://localhost:3000/api/seller/order/67eedcf8c2c643224aa2588b' \
+--header 'Authorization: Bearer <token>'
+```
+
+**Response**:  
+```json
+{
+  "success": true,
+  "data": {
+    "shippingAddress": {
+      "street": "123 Main St",
+      "city": "Colombo",
+      "country": "Sri Lanka",
+      "postalCode": "10000"
+    },
+    "_id": "67eedcf8c2c643224aa2588b",
+    "buyerId": {
+      "_id": "67e754164d954ec2d0057524",
+      "email": "buyer@example.com",
+      "name": "buyer User",
+      "phone": "+1234567890"
+    },
+    "items": [
+      {
+        "productId": {
+          "_id": "67eed74dc1daf109f57052ca",
+          "title": "Toyota Camry Brake Pads",
+          "price": 75,
+          "condition": "New",
+          "brand": "Bosch",
+          "images": ["https://example.com/brake-pads.jpg"],
+          "sellerId": "67e754164d954ec2d0057521"
+        },
+        "quantity": 2,
+        "price": 75,
+        "sellerStatus": "Shipped",
+        "_id": "67eedcf8c2c643224aa2588c"
+      }
+    ],
+    "total": 300,
+    "status": "Pending",
+    "statusHistory": [
+      {
+        "status": "Seller updated to Shipped",
+        "updatedAt": "2025-04-03T19:18:30.179Z",
+        "_id": "67eedf06658f7010dc50bd6b"
+      }
+    ],
+    "createdAt": "2025-04-03T19:09:44.839Z",
+    "updatedAt": "2025-04-03T19:18:30.184Z",
+    "__v": 1
+  }
+}
+```
+
+---
+
+### **1.3 Update Order Status**  
+**Endpoint**: `PUT /order/:id/status`  
+**Description**: Updates the `sellerStatus` of items in an order that belong to the authenticated seller.
+
+**Request Body**:  
+```json
+{
+  "status": "string" // Allowed values: "Processing", "Shipped", "Delivered"
+}
+```
+
+**Example Request**:  
+```bash
+curl --location --request PUT 'http://localhost:3000/api/seller/order/67eedcf8c2c643224aa2588b/status' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer <token>' \
+--data '{"status": "Shipped"}'
+```
+
+**Response**:  
+```json
+{
+  "success": true,
+  "message": "Order status updated to Shipped"
+}
+```
+
+---
+
+## **Error Responses**  
+| Status Code | Description                  | Example Response                                      |
+|-------------|------------------------------|-----------------------------------------------------|
+| **400**     | Invalid status provided      | `{"success": false, "message": "Invalid status"}`   |
+| **401**     | Unauthorized (invalid JWT)   | `{"success": false, "message": "No token, authorization denied"}` |
+| **403**     | Not a seller                 | `{"success": false, "message": "Access denied, sellers only"}` |
+| **404**     | Order not found or no items  | `{"success": false, "message": "No items in this order belong to you"}` |
+| **500**     | Server error                 | `{"success": false, "message": "Internal server error"}` |
+
+---
+
+## **Notes**  
+1. **Seller Scope**: Only items where `productId.sellerId` matches the authenticated seller’s ID are included in responses.  
+2. **Status Management**: 
+   - `sellerStatus` tracks individual item progress (`Pending`, `Processing`, `Shipped`, `Delivered`).
+   - Overall order `status` (`Pending`, `Confirmed`, `Shipped`, `Delivered`, `Cancelled`) is managed at the buyer level.
+3. **Mixed Orders**: If an order contains products from multiple sellers, only the authenticated seller’s items are shown.  
+4. **History**: Updates to `sellerStatus` are logged in `statusHistory` with a descriptive message (e.g., "Seller updated to Shipped").  
+
+---
+
+### **Example Workflow**  
+1. **View Orders** → `GET /orders` to see all orders with your products.  
+2. **Check Details** → `GET /order/:id` to inspect a specific order.  
+3. **Update Status** → `PUT /order/:id/status` to mark items as "Shipped" or "Delivered".  
+
+This API enables sellers to **manage orders** for their products efficiently. 📦🚚
+
+---
+
+
+
+# **Profile Management API Documentation**  
+**Base URL**: `http://localhost:3000/api/profile`  
+
+---
+
+## **Authentication**  
+All endpoints require a **JWT token** in the `Authorization` header:  
+```
+Authorization: Bearer <token>
+```
+
+---
+
+## **1. Profile Management**  
+### **1.1 Get Profile**  
+**Endpoint**: `GET /`  
+**Description**: Retrieves the authenticated user’s profile details.
+
+**Example Request**:  
+```bash
+curl --location 'http://localhost:3000/api/profile' \
+--header 'Authorization: Bearer <token>'
+```
+
+**Response**:  
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "67e754164d954ec2d0057524",
+    "role": "buyer",
+    "email": "buyer@example.com",
+    "name": "Buyer Name",
+    "phone": "1234567890",
+    "profileImage": "http://localhost:3000/uploads/1634567890123-profile.jpg",
+    "addresses": [
+      {
+        "street": "123 Main St",
+        "city": "Colombo",
+        "country": "Sri Lanka",
+        "postalCode": "10000",
+        "isDefault": true
+      }
+    ],
+    "status": "active"
+  }
+}
+```
+
+---
+
+### **1.2 Update Profile**  
+**Endpoint**: `PUT /`  
+**Description**: Updates the authenticated user’s profile details.
+
+**Request Body**:  
+```json
+{
+  "name": "string",
+  "phone": "string",
+  "profileImage": "string",
+  "password": "string",
+  "addresses": [
+    {
+      "street": "string",
+      "city": "string",
+      "country": "string",
+      "postalCode": "string",
+      "isDefault": boolean
+    }
+  ]
+}
+```
+
+**Example Request**:  
+```bash
+curl --location --request PUT 'http://localhost:3000/api/profile' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer <token>' \
+--data '{
+  "name": "Updated Buyer",
+  "phone": "9876543210",
+  "profileImage": "http://localhost:3000/uploads/1634567890124-new-profile.jpg",
+  "password": "newpassword123",
+  "addresses": [
+    {
+      "street": "456 New St",
+      "city": "Kandy",
+      "country": "Sri Lanka",
+      "postalCode": "20000",
+      "isDefault": true
+    }
+  ]
+}'
+```
+
+**Response**:  
+```json
+{
+  "success": true,
+  "message": "Profile updated successfully",
+  "data": {
+    "_id": "67e754164d954ec2d0057524",
+    "role": "buyer",
+    "email": "buyer@example.com",
+    "name": "Updated Buyer",
+    "phone": "9876543210",
+    "profileImage": "http://localhost:3000/uploads/1634567890124-new-profile.jpg",
+    "addresses": [
+      {
+        "street": "456 New St",
+        "city": "Kandy",
+        "country": "Sri Lanka",
+        "postalCode": "20000",
+        "isDefault": true
+      }
+    ],
+    "status": "active"
+  }
+}
+```
+
+---
+
+### **1.3 Delete Profile**  
+**Endpoint**: `DELETE /`  
+**Description**: Deactivates the authenticated user’s profile (soft delete).
+
+**Example Request**:  
+```bash
+curl --location --request DELETE 'http://localhost:3000/api/profile' \
+--header 'Authorization: Bearer <token>'
+```
+
+**Response**:  
+```json
+{
+  "success": true,
+  "message": "Profile deactivated successfully"
+}
+```
+
+---
+
+## **Error Responses**  
+| Status Code | Description                  | Example Response                                      |
+|-------------|------------------------------|-----------------------------------------------------|
+| **400**     | Invalid input (e.g., multiple default addresses) | `{"success": false, "message": "Only one address can be default"}` |
+| **401**     | Unauthorized (invalid JWT)   | `{"success": false, "message": "No token, authorization denied"}` |
+| **404**     | User not found               | `{"success": false, "message": "User not found"}` |
+| **500**     | Server error                 | `{"success": false, "message": "Internal server error"}` |
+
+---
+
+## **Notes**  
+1. **Profile Image**: Use the `/api/media/upload` endpoint to upload an image and get a URL, then pass it in the `profileImage` field.
+2. **Addresses**: Optional; only one address can be marked as `isDefault`.  
+3. **Soft Delete**: Deactivation sets `status` to "inactive" instead of removing the user from the database.  
+4. **Password Update**: If provided, the password is hashed before saving.
+
+---
+
+### **Example Workflow**  
+1. **Get Profile** → `GET /` to view current details.  
+2. **Upload Image** → `POST /api/media/upload` to get a profile image URL.  
+3. **Update Profile** → `PUT /` with new details (e.g., name, image URL).  
+4. **Delete Profile** → `DELETE /` to deactivate the account.  
+
+This API enables users to **manage their profiles** effectively. 👤✨
+
+---
+
+### Integration Notes
+- Ensure `bcryptjs` is installed (`npm install bcryptjs`) for password hashing.
+- The `authMiddleware` from `middleware/auth.js` is assumed to exist and work as in your previous code.
+- Test locally with the provided `curl` requests, replacing `<jwt-token>` with a valid token from `/api/auth/login`.
+
+Let me know if you need further adjustments or additional endpoints!
