@@ -355,7 +355,95 @@ Authorization: Bearer <token>
             "_id": "67e8ba833dc8d3b9b6c6660d",
             "name": "Engine & Transmission",
             "parentCategory": null,
-            "status": "active"
+            "status": "active",
+            "createdAt": "2025-03-30T03:29:07.653Z",
+            "updatedAt": "2025-03-30T03:29:07.653Z",
+            "__v": 0,
+            "categoryOption": [
+                {
+                    "_id": "67e8ba833dc8d3b9b6c66610",
+                    "name": "Engine Components",
+                    "parentCategory": {
+                        "_id": "67e8ba833dc8d3b9b6c6660d",
+                        "name": "Engine & Transmission"
+                    },
+                    "status": "active",
+                    "createdAt": "2025-03-30T03:29:07.798Z",
+                    "updatedAt": "2025-03-30T03:29:07.798Z",
+                    "__v": 0
+                },
+                {
+                    "_id": "67e8ba833dc8d3b9b6c66612",
+                    "name": "Transmission & Drivetrain",
+                    "parentCategory": {
+                        "_id": "67e8ba833dc8d3b9b6c6660d",
+                        "name": "Engine & Transmission"
+                    },
+                    "status": "active",
+                    "createdAt": "2025-03-30T03:29:07.947Z",
+                    "updatedAt": "2025-03-30T03:29:07.947Z",
+                    "__v": 0
+                },
+                {
+                    "_id": "67e8ba843dc8d3b9b6c66614",
+                    "name": "Fuel System",
+                    "parentCategory": {
+                        "_id": "67e8ba833dc8d3b9b6c6660d",
+                        "name": "Engine & Transmission"
+                    },
+                    "status": "active",
+                    "createdAt": "2025-03-30T03:29:08.111Z",
+                    "updatedAt": "2025-03-30T03:29:08.111Z",
+                    "__v": 0
+                },
+                {
+                    "_id": "67e8ba843dc8d3b9b6c66616",
+                    "name": "Cooling System",
+                    "parentCategory": {
+                        "_id": "67e8ba833dc8d3b9b6c6660d",
+                        "name": "Engine & Transmission"
+                    },
+                    "status": "active",
+                    "createdAt": "2025-03-30T03:29:08.271Z",
+                    "updatedAt": "2025-03-30T03:29:08.271Z",
+                    "__v": 0
+                }
+            ]
+        },
+        {
+            "_id": "67e8ba843dc8d3b9b6c6660f",
+            "name": "Suspension & Steering",
+            "parentCategory": null,
+            "status": "active",
+            "createdAt": "2025-03-30T03:29:08.433Z",
+            "updatedAt": "2025-03-30T03:29:08.433Z",
+            "__v": 0,
+            "categoryOption": [
+                {
+                    "_id": "67e8ba843dc8d3b9b6c66611",
+                    "name": "Suspension Components",
+                    "parentCategory": {
+                        "_id": "67e8ba843dc8d3b9b6c6660f",
+                        "name": "Suspension & Steering"
+                    },
+                    "status": "active",
+                    "createdAt": "2025-03-30T03:29:08.598Z",
+                    "updatedAt": "2025-03-30T03:29:08.598Z",
+                    "__v": 0
+                },
+                {
+                    "_id": "67e8ba843dc8d3b9b6c66613",
+                    "name": "Steering Components",
+                    "parentCategory": {
+                        "_id": "67e8ba843dc8d3b9b6c6660f",
+                        "name": "Suspension & Steering"
+                    },
+                    "status": "active",
+                    "createdAt": "2025-03-30T03:29:08.762Z",
+                    "updatedAt": "2025-03-30T03:29:08.762Z",
+                    "__v": 0
+                }
+            ]
         }
     ]
 }
@@ -1576,12 +1664,12 @@ curl --location --request DELETE 'http://localhost:3000/api/profile' \
 ---
 
 ## **Error Responses**  
-| Status Code | Description                  | Example Response                                      |
-|-------------|------------------------------|-----------------------------------------------------|
+| Status Code | Description                                      | Example Response                                                   |
+| ----------- | ------------------------------------------------ | ------------------------------------------------------------------ |
 | **400**     | Invalid input (e.g., multiple default addresses) | `{"success": false, "message": "Only one address can be default"}` |
-| **401**     | Unauthorized (invalid JWT)   | `{"success": false, "message": "No token, authorization denied"}` |
-| **404**     | User not found               | `{"success": false, "message": "User not found"}` |
-| **500**     | Server error                 | `{"success": false, "message": "Internal server error"}` |
+| **401**     | Unauthorized (invalid JWT)                       | `{"success": false, "message": "No token, authorization denied"}`  |
+| **404**     | User not found                                   | `{"success": false, "message": "User not found"}`                  |
+| **500**     | Server error                                     | `{"success": false, "message": "Internal server error"}`           |
 
 ---
 
@@ -1609,3 +1697,1132 @@ This API enables users to **manage their profiles** effectively. 👤✨
 - Test locally with the provided `curl` requests, replacing `<jwt-token>` with a valid token from `/api/auth/login`.
 
 Let me know if you need further adjustments or additional endpoints!
+
+Below is the API documentation for the Courier-related APIs in the requested format, covering the individual endpoints from `courierController.js`. This includes `GET /orders`, `GET /order/:id`, `PUT /order/:id/status`, `POST /order/:id/report-issue`, and `GET /analytics`, with the automatic tracking number generation feature included.
+
+---
+
+# **Courier API Documentation**
+**Base URL**: `http://localhost:3000/api/courier`
+
+---
+
+## **Authentication**
+All endpoints require a **JWT token** in the `Authorization` header:  
+```
+Authorization: Bearer <courier-jwt-token>
+```
+
+---
+
+## **1. Courier Management**
+
+### **1.1 Get Courier Orders**
+**Endpoint**: `GET /orders`  
+**Description**: Retrieves all orders assigned to the courier or available in their region (district) with status "Shipped" and no assigned courier.
+
+**Example Request**:  
+```bash
+curl --location 'http://localhost:3000/api/courier/orders' \
+--header 'Authorization: Bearer <courier-jwt-token>'
+```
+
+**Response**:  
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "67eedcf8c2c643224aa2588b",
+      "buyerId": {
+        "_id": "67e754164d954ec2d0057524",
+        "name": "Buyer User",
+        "email": "buyer@example.com",
+        "phone": "+1234567890"
+      },
+      "items": [
+        {
+          "productId": {
+            "_id": "67eed74dc1daf109f57052ca",
+            "title": "Toyota Camry Brake Pads",
+            "price": 75,
+            "condition": "New",
+            "brand": "Bosch",
+            "images": ["https://example.com/brake-pads.jpg"],
+            "sellerId": "67e754164d954ec2d0057521"
+          },
+          "quantity": 2,
+          "price": 75,
+          "sellerStatus": "Shipped"
+        }
+      ],
+      "total": 150,
+      "status": "Shipped",
+      "shippingAddress": {
+        "street": "123 Main St",
+        "city": "Colombo",
+        "district": "Colombo",
+        "country": "Sri Lanka",
+        "postalCode": "10000"
+      },
+      "courierDetails": {
+        "courierId": null,
+        "trackingNumber": "TRK-12345"
+      },
+      "courierStatus": "Pending",
+      "statusHistory": [
+        {
+          "status": "Handed over to courier service",
+          "updatedBy": { "role": "seller", "userId": "67e754164d954ec2d0057521" },
+          "updatedAt": "2025-04-05T10:00:00.000Z"
+        }
+      ],
+      "createdAt": "2025-04-05T09:00:00.000Z",
+      "updatedAt": "2025-04-05T10:00:00.000Z"
+    }
+  ]
+}
+```
+
+---
+
+### **1.2 Get Courier Order by ID**
+**Endpoint**: `GET /order/:id`  
+**Description**: Retrieves details of a specific order assigned to the courier or available in their region.
+
+**Example Request**:  
+```bash
+curl --location 'http://localhost:3000/api/courier/order/67eedcf8c2c643224aa2588b' \
+--header 'Authorization: Bearer <courier-jwt-token>'
+```
+
+**Response**:  
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "67eedcf8c2c643224aa2588b",
+    "buyerId": {
+      "_id": "67e754164d954ec2d0057524",
+      "name": "Buyer User",
+      "email": "buyer@example.com",
+      "phone": "+1234567890"
+    },
+    "items": [
+      {
+        "productId": {
+          "_id": "67eed74dc1daf109f57052ca",
+          "title": "Toyota Camry Brake Pads",
+          "price": 75,
+          "condition": "New",
+          "brand": "Bosch",
+          "images": ["https://example.com/brake-pads.jpg"],
+          "sellerId": "67e754164d954ec2d0057521"
+        },
+        "quantity": 2,
+        "price": 75,
+        "sellerStatus": "Shipped"
+      }
+    ],
+    "total": 150,
+    "status": "Shipped",
+    "shippingAddress": {
+      "street": "123 Main St",
+      "city": "Colombo",
+      "district": "Colombo",
+      "country": "Sri Lanka",
+      "postalCode": "10000"
+    },
+    "courierDetails": {
+      "courierId": "67e754164d954ec2d0057525",
+      "trackingNumber": "TRK-123456-7890"
+    },
+    "courierStatus": "Picked Up",
+    "statusHistory": [
+      {
+        "status": "Courier assigned",
+        "updatedBy": { "role": "courier", "userId": "67e754164d954ec2d0057525" },
+        "updatedAt": "2025-04-05T11:00:00.000Z"
+      },
+      {
+        "status": "Courier updated to Picked Up",
+        "updatedBy": { "role": "courier", "userId": "67e754164d954ec2d0057525" },
+        "updatedAt": "2025-04-05T11:00:00.000Z"
+      }
+    ],
+    "createdAt": "2025-04-05T09:00:00.000Z",
+    "updatedAt": "2025-04-05T11:00:00.000Z"
+  }
+}
+```
+
+---
+
+### **1.3 Update Courier Status**
+**Endpoint**: `PUT /order/:id/status`  
+**Description**: Updates the courier status of an order. A tracking number is automatically generated when status is set to "Picked Up" if not already present.
+
+**Request Body**:  
+```json
+{
+  "status": "string", // "Picked Up", "In Transit", "Out for Delivery", "Delivered", "Failed Delivery"
+  "reason": "string"  // Required if status is "Failed Delivery"
+}
+```
+
+**Example Request**:  
+```bash
+curl --location --request PUT 'http://localhost:3000/api/courier/order/67eedcf8c2c643224aa2588b/status' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer <courier-jwt-token>' \
+--data '{
+  "status": "Picked Up"
+}'
+```
+
+**Response**:  
+```json
+{
+  "success": true,
+  "message": "Courier status updated to Picked Up",
+  "trackingNumber": "TRK-123456-7890"
+}
+```
+
+**Example Request (Failed Delivery)**:  
+```bash
+curl --location --request PUT 'http://localhost:3000/api/courier/order/67eedcf8c2c643224aa2588b/status' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer <courier-jwt-token>' \
+--data '{
+  "status": "Failed Delivery",
+  "reason": "Customer not available"
+}'
+```
+
+**Response**:  
+```json
+{
+  "success": true,
+  "message": "Courier status updated to Failed Delivery",
+  "trackingNumber": "TRK-123456-7890"
+}
+```
+
+---
+
+### **1.4 Report Delivery Issue**
+**Endpoint**: `POST /order/:id/report-issue`  
+**Description**: Reports a delivery issue for an order, setting the courier status to "Failed Delivery".
+
+**Request Body**:  
+```json
+{
+  "reason": "string" // Required
+}
+```
+
+**Example Request**:  
+```bash
+curl --location --request POST 'http://localhost:3000/api/courier/order/67eedcf8c2c643224aa2588b/report-issue' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer <courier-jwt-token>' \
+--data '{
+  "reason": "Address not found"
+}'
+```
+
+**Response**:  
+```json
+{
+  "success": true,
+  "message": "Delivery issue reported"
+}
+```
+
+---
+
+### **1.5 Get Courier Analytics**
+**Endpoint**: `GET /analytics`  
+**Description**: Retrieves analytics data for the courier, including order status breakdown, success rate, and average delivery time.
+
+**Example Request**:  
+```bash
+curl --location 'http://localhost:3000/api/courier/analytics' \
+--header 'Authorization: Bearer <courier-jwt-token>'
+```
+
+**Response**:  
+```json
+{
+  "success": true,
+  "data": {
+    "statusBreakdown": {
+      "totalOrders": 20,
+      "pending": 5,
+      "pickedUp": 3,
+      "inTransit": 2,
+      "outForDelivery": 1,
+      "delivered": 8,
+      "failed": 1
+    },
+    "successRate": "88.89",
+    "averageDeliveryTime": "24.50 hours"
+  }
+}
+```
+
+---
+
+## **Error Responses**
+| Status Code | Description                  | Example Response                                      |
+|-------------|------------------------------|-----------------------------------------------------|
+| **400**     | Invalid input (e.g., invalid status) | `{"success": false, "message": "Invalid status"}` |
+| **400**     | Missing reason for "Failed Delivery" | `{"success": false, "message": "Reason required for Failed Delivery"}` |
+| **401**     | Unauthorized (invalid JWT)   | `{"success": false, "message": "No token, authorization denied"}` |
+| **403**     | Order assigned to another courier | `{"success": false, "message": "Order assigned to another courier"}` |
+| **404**     | Order not found or inaccessible | `{"success": false, "message": "Order not found or not accessible"}` |
+| **500**     | Server error                 | `{"success": false, "message": "Internal server error"}` |
+
+---
+
+### Notes
+- **Tracking Number**: Automatically generated on "Picked Up" status if not already set (e.g., `TRK-123456-7890`).
+- **Order Access**: Couriers can only access orders assigned to them or unassigned orders in their region (district).
+- **Status History**: Updates are logged in `statusHistory` for all status changes and issue reports.
+
+---
+
+# **Analytics API Documentation**
+
+---
+
+## **Authentication**
+All endpoints require a **JWT token** in the `Authorization` header:  
+```
+Authorization: Bearer <token>
+```
+
+---
+
+## **1. Admin Analytics**
+**Base URL**: `http://localhost:3000/api/admin`
+
+### **1.1 Get Admin Analytics**
+**Endpoint**: `GET /analytics`  
+**Description**: Retrieves comprehensive analytics for the admin panel, including total orders, revenue, user stats, order status breakdown, top products, top sellers, and courier performance.
+
+**Example Request**:  
+```bash
+curl --location 'http://localhost:3000/api/admin/analytics' \
+--header 'Authorization: Bearer <admin-jwt-token>'
+```
+
+**Response**:  
+```json
+{
+  "success": true,
+  "data": {
+    "totalOrders": 100,
+    "totalRevenue": 75000,
+    "usersByRole": {
+      "admin": 1,
+      "seller": 10,
+      "courier": 5,
+      "buyer": 50
+    },
+    "orderStatusBreakdown": {
+      "Pending": 20,
+      "Confirmed": 30,
+      "Shipped": 25,
+      "Delivered": 20,
+      "Cancelled": 5
+    },
+    "topProducts": [
+      {
+        "_id": "67eed74dc1daf109f57052ca",
+        "title": "Toyota Camry Brake Pads",
+        "totalSold": 50,
+        "revenue": 3750
+      }
+    ],
+    "topSellers": [
+      {
+        "_id": "67e754164d954ec2d0057521",
+        "name": "Seller 1",
+        "storeName": "Auto Parts",
+        "revenue": 20000
+      }
+    ],
+    "courierPerformance": [
+      {
+        "_id": "67e754164d954ec2d0057525",
+        "name": "Courier 1",
+        "delivered": 15,
+        "failed": 2
+      }
+    ]
+  }
+}
+```
+
+---
+
+## **2. Seller Analytics**
+**Base URL**: `http://localhost:3000/api/seller`
+
+### **2.1 Get Seller Analytics**
+**Endpoint**: `GET /analytics`  
+**Description**: Retrieves analytics for the authenticated seller, including total orders, revenue, status breakdown for their items, top products, and low stock products.
+
+**Example Request**:  
+```bash
+curl --location 'http://localhost:3000/api/seller/analytics' \
+--header 'Authorization: Bearer <seller-jwt-token>'
+```
+
+**Response**:  
+```json
+{
+  "success": true,
+  "data": {
+    "totalOrders": 25,
+    "totalRevenue": 20000,
+    "statusBreakdown": {
+      "Pending": 5,
+      "Processing": 5,
+      "Shipped": 10,
+      "Delivered": 5
+    },
+    "topProducts": [
+      {
+        "_id": "67eed74dc1daf109f57052ca",
+        "title": "Toyota Camry Brake Pads",
+        "totalSold": 50,
+        "revenue": 3750
+      }
+    ],
+    "lowStockProducts": [
+      {
+        "_id": "67eed74dc1daf109f57052cb",
+        "title": "Honda Civic Oil Filter",
+        "stock": 8
+      }
+    ]
+  }
+}
+```
+
+---
+
+## **3. Courier Analytics**
+**Base URL**: `http://localhost:3000/api/courier`
+
+### **3.1 Get Courier Analytics**
+**Endpoint**: `GET /analytics`  
+**Description**: Retrieves analytics for the authenticated courier, including order status breakdown, delivery success rate, and average delivery time.
+
+**Example Request**:  
+```bash
+curl --location 'http://localhost:3000/api/courier/analytics' \
+--header 'Authorization: Bearer <courier-jwt-token>'
+```
+
+**Response**:  
+```json
+{
+  "success": true,
+  "data": {
+    "statusBreakdown": {
+      "totalOrders": 20,
+      "pending": 5,
+      "pickedUp": 3,
+      "inTransit": 2,
+      "outForDelivery": 1,
+      "delivered": 8,
+      "failed": 1
+    },
+    "successRate": "88.89",
+    "averageDeliveryTime": "24.50 hours"
+  }
+}
+```
+
+---
+
+## **4. Buyer Analytics**
+**Base URL**: `http://localhost:3000/api/buyer`
+
+### **4.1 Get Buyer Analytics**
+**Endpoint**: `GET /analytics`  
+**Description**: Retrieves analytics for the authenticated buyer, including total orders, total spent, average order value, and order status breakdown.
+
+**Example Request**:  
+```bash
+curl --location 'http://localhost:3000/api/buyer/analytics' \
+--header 'Authorization: Bearer <buyer-jwt-token>'
+```
+
+**Response**:  
+```json
+{
+  "success": true,
+  "data": {
+    "totalOrders": 10,
+    "totalSpent": 1500,
+    "averageOrderValue": "150.00",
+    "statusBreakdown": {
+      "Pending": 2,
+      "Confirmed": 3,
+      "Shipped": 2,
+      "Delivered": 3
+    }
+  }
+}
+```
+
+---
+
+## **Error Responses**
+| Status Code | Description                  | Example Response                                      |
+|-------------|------------------------------|-----------------------------------------------------|
+| **400**     | Invalid role or missing data | `{"success": false, "message": "Invalid courier or region not assigned"}` (Courier) |
+| **401**     | Unauthorized (invalid JWT)   | `{"success": false, "message": "No token, authorization denied"}` |
+| **403**     | Access denied (wrong role)   | `{"success": false, "message": "Access denied, admins only"}` (Admin) |
+| **500**     | Server error                 | `{"success": false, "message": "Internal server error"}` |
+
+---
+
+### Notes
+- **Admin**: Requires `role: "admin"` in the JWT payload.
+- **Seller**: Filters data to the authenticated seller’s products only.
+- **Courier**: Filters data to the authenticated courier’s assigned orders; `averageDeliveryTime` is "N/A" if no completed deliveries exist.
+- **Buyer**: Reflects the authenticated buyer’s order history; revenue/spending is based on "Delivered" orders.
+
+This documentation covers all "Get Analytics" endpoints as requested. Let me know if you need additional details or adjustments!
+
+# Admin Oversight
+
+---
+#### 1. Get All Orders
+**Endpoint**: `GET /api/admin/orders`  
+**Description**: Retrieves all orders in the system with optional filters for status, date range, and district.
+
+**Query Parameters**:  
+- `status` (optional): Filter by order status (e.g., "Pending", "Shipped", "Delivered").
+- `startDate` (optional): Filter orders created on or after this date (ISO format, e.g., "2025-01-01").
+- `endDate` (optional): Filter orders created on or before this date (ISO format, e.g., "2025-04-07").
+- `district` (optional): Filter by shipping address district (e.g., "Colombo").
+
+**Example Request**:  
+```bash
+curl --location 'http://localhost:3000/api/admin/orders?status=Shipped&district=Colombo' \
+--header 'Authorization: Bearer <admin-jwt-token>'
+```
+
+**Response**:  
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "67eedcf8c2c643224aa2588b",
+      "buyerId": {
+        "_id": "67e754164d954ec2d0057524",
+        "name": "Buyer User",
+        "email": "buyer@example.com",
+        "phone": "+1234567890"
+      },
+      "items": [
+        {
+          "productId": {
+            "_id": "67eed74dc1daf109f57052ca",
+            "title": "Toyota Camry Brake Pads",
+            "price": 75,
+            "brand": "Bosch",
+            "condition": "New",
+            "images": ["https://example.com/brake-pads.jpg"]
+          },
+          "quantity": 2,
+          "price": 75,
+          "sellerStatus": "Shipped"
+        }
+      ],
+      "total": 150,
+      "status": "Shipped",
+      "shippingAddress": {
+        "street": "123 Main St",
+        "city": "Colombo",
+        "district": "Colombo",
+        "country": "Sri Lanka",
+        "postalCode": "10000"
+      },
+      "courierDetails": {
+        "courierId": {
+          "_id": "67e754164d954ec2d0057525",
+          "name": "Courier 1",
+          "phone": "+9876543210",
+          "region": "Colombo"
+        },
+        "trackingNumber": "TRK-123456-7890"
+      },
+      "courierStatus": "Picked Up",
+      "statusHistory": [
+        {
+          "status": "Handed over to courier service",
+          "updatedBy": { "role": "seller", "userId": "67e754164d954ec2d0057521" },
+          "updatedAt": "2025-04-05T10:00:00.000Z"
+        }
+      ],
+      "createdAt": "2025-04-05T09:00:00.000Z",
+      "updatedAt": "2025-04-05T11:00:00.000Z"
+    }
+  ]
+}
+```
+
+---
+
+#### 2. Get All Products
+**Endpoint**: `GET /api/admin/products`  
+**Description**: Retrieves all products listed in the system with optional filters for status, category, and seller.
+
+**Query Parameters**:  
+- `status` (optional): Filter by product status (e.g., "active", "deleted").
+- `category` (optional): Filter by category ID (e.g., "67eed74dc1daf109f57052ca").
+- `sellerId` (optional): Filter by seller ID (e.g., "67e754164d954ec2d0057521").
+
+**Example Request**:  
+```bash
+curl --location 'http://localhost:3000/api/admin/products?status=active&sellerId=67e754164d954ec2d0057521' \
+--header 'Authorization: Bearer <admin-jwt-token>'
+```
+
+**Response**:  
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "67eed74dc1daf109f57052ca",
+      "title": "Toyota Camry Brake Pads",
+      "description": "High-quality brake pads for Toyota Camry",
+      "price": 75,
+      "category": {
+        "_id": "67eed74dc1daf109f57052cb",
+        "name": "Brake Parts"
+      },
+      "stock": 20,
+      "condition": "New",
+      "brand": "Bosch",
+      "oem": "OEM123",
+      "aftermarket": false,
+      "material": "Ceramic",
+      "makeModel": [
+        { "make": "Toyota", "model": "Camry" }
+      ],
+      "years": [2019, 2020],
+      "availability": "In Stock",
+      "images": ["https://example.com/brake-pads.jpg"],
+      "sellerId": {
+        "_id": "67e754164d954ec2d0057521",
+        "name": "Seller 1",
+        "email": "seller1@example.com",
+        "storeName": "Auto Parts Hub"
+      },
+      "status": "active",
+      "createdAt": "2025-01-01T08:00:00.000Z",
+      "updatedAt": "2025-04-05T10:00:00.000Z"
+    }
+  ]
+}
+```
+
+
+
+---
+
+# **Buyer Product Filter Options API Documentation**
+**Base URL**: `http://localhost:3000/api/buyer`
+
+---
+
+## **Authentication**
+All endpoints require a **JWT token** in the `Authorization` header:  
+```
+Authorization: Bearer <buyer-jwt-token>
+```
+
+---
+
+## **1. Get Product Filter Options**
+**Endpoint**: `GET /product-filter-options`  
+**Description**: Retrieves all available filter options for product search dropdowns based on the `Product` model. This includes dynamic values from the database for fields like condition, brand, OEM, material, availability, aftermarket, make, model, years, and category, as well as a calculated price range for numeric inputs. The response is designed to populate frontend dropdown menus and price range inputs.
+
+**Example Request**:  
+```bash
+curl --location 'http://localhost:3000/api/buyer/product-filter-options' \
+--header 'Authorization: Bearer <buyer-jwt-token>'
+```
+
+**Response**:  
+```json
+{
+  "success": true,
+  "data": {
+    "condition": ["All", "New", "Refurbished", "Used"],
+    "brand": ["All", "Bosch", "Brembo", "Denso"],
+    "oem": ["All", "OEM123", "OEM456", "OEM789"],
+    "material": ["All", "Aluminum", "Cast Iron", "Ceramic", "Steel"],
+    "availability": ["All", "In Stock", "Pre-order"],
+    "aftermarket": ["All", "true", "false"],
+    "make": ["All", "Chrysler", "Nissan", "Toyota"],
+    "model": ["All", "Altima", "Camry", "Corolla", "Pacifica"],
+    "years": ["All", "2015", "2016", "2018", "2019", "2020"],
+    "category": ["All", "67eed74dc1daf109f57052ca", "67eed74dc1daf109f57052cb"],
+    "priceRange": {
+      "min": 10,
+      "max": 500
+    }
+  }
+}
+```
+
+---
+
+## **Response Fields**
+| **Field**         | **Type**         | **Description**                                                                 |
+|-------------------|------------------|--------------------------------------------------------------------------------|
+| `condition`       | Array of Strings | All possible product conditions, with "All" as the default option.             |
+| `brand`           | Array of Strings | Unique brands from products, with "All" added.                                 |
+| `oem`             | Array of Strings | Unique OEM numbers from products, with "All" added.                            |
+| `material`        | Array of Strings | Unique materials from products, with "All" added.                              |
+| `availability`    | Array of Strings | All possible availability statuses, with "All" added.                          |
+| `aftermarket`     | Array of Strings | Boolean options as strings ("true", "false"), with "All" added.                |
+| `make`            | Array of Strings | Unique makes from the `makeModel` array, with "All" added.                     |
+| `model`           | Array of Strings | Unique models from the `makeModel` array, with "All" added.                    |
+| `years`           | Array of Strings | Unique years from products, converted to strings, with "All" added.            |
+| `category`        | Array of Strings | Unique category IDs from products, with "All" added.                           |
+| `priceRange`      | Object           | Minimum and maximum price range for numeric inputs.                            |
+| `priceRange.min`  | Number           | Lowest price among active products (defaults to 0 if no data).                 |
+| `priceRange.max`  | Number           | Highest price among active products (defaults to 1000 if no data).             |
+
+---
+
+## **Error Responses**
+| Status Code | Description                  | Example Response                                      |
+|-------------|------------------------------|-----------------------------------------------------|
+| **401**     | Unauthorized (invalid JWT)   | `{"success": false, "message": "No token, authorization denied"}` |
+| **500**     | Server error                 | `{"success": false, "message": "Internal server error"}` |
+
+
+---
+
+# **Analytics API Documentation**
+
+## **Base URL**
+- **Admin**: `http://localhost:3000/api/admin`
+- **Seller**: `http://localhost:3000/api/seller`
+- **Courier**: `http://localhost:3000/api/courier`
+
+---
+
+## **Authentication**
+All endpoints require a **JWT token** in the `Authorization` header:  
+```
+Authorization: Bearer <jwt-token>
+```
+- The token must correspond to the appropriate role:
+  - Admin endpoints: `role: "admin"`
+  - Seller endpoints: `role: "seller"`
+  - Courier endpoints: `role: "courier"`
+
+---
+
+# **1. Admin Analytics API**
+
+## **Get Admin Analytics**
+**Endpoint**: `GET /analytics`  
+**Base URL**: `http://localhost:3000/api/admin`  
+**Description**: Retrieves comprehensive analytics for the admin, including total orders, revenue, user counts by role, order status breakdown, top products, top sellers, and courier performance.
+
+**Example Request**:  
+```bash
+curl --location 'http://localhost:3000/api/admin/analytics' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZTYyMzdhMTIwOTk4NjA0OGRiODU2MCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0NDM1MjIyMiwiZXhwIjoxNzQ0MzU1ODIyfQ.-PMIYd0k51WtATVPk7lqpT-jRTELRVxvYXMHvoBiCoU'
+```
+
+**Response**:  
+```json
+{
+    "success": true,
+    "data": {
+        "totalOrders": 3,
+        "totalRevenue": 300,
+        "usersByRole": {
+            "admin": 2,
+            "courier": 4,
+            "buyer": 4,
+            "seller": 3
+        },
+        "orderStatusBreakdown": {
+            "Shipped": 1,
+            "Pending": 1,
+            "Delivered": 1
+        },
+        "topProducts": [],
+        "topSellers": [],
+        "courierPerformance": [
+            {
+                "_id": "67f2823d2fe8a424edc522bd",
+                "delivered": 1,
+                "failed": 1,
+                "name": "sam courier"
+            }
+        ]
+    }
+}
+```
+
+### **Response Fields**
+| **Field**                | **Type**         | **Description**                                                                 |
+|--------------------------|------------------|--------------------------------------------------------------------------------|
+| `totalOrders`            | Number           | Total number of orders in the system.                                          |
+| `totalRevenue`           | Number           | Total revenue from all orders (in dollars).                                    |
+| `usersByRole`            | Object           | Count of users by role (keys: `admin`, `courier`, `buyer`, `seller`).          |
+| `orderStatusBreakdown`   | Object           | Breakdown of orders by status (e.g., `Shipped`, `Pending`, `Delivered`).       |
+| `topProducts`            | Array            | List of top-selling products (empty if no data).                               |
+| `topSellers`             | Array            | List of top-performing sellers (empty if no data).                             |
+| `courierPerformance`     | Array of Objects | Performance metrics for couriers.                                              |
+| `courierPerformance._id` | String           | Courier’s unique ID.                                                           |
+| `courierPerformance.delivered` | Number     | Number of orders successfully delivered by the courier.                        |
+| `courierPerformance.failed` | Number      | Number of orders that failed delivery by the courier.                          |
+| `courierPerformance.name` | String        | Name of the courier.                                                           |
+
+---
+
+# **2. Admin Orders API**
+
+## **Get Orders**
+**Endpoint**: `GET /orders`  
+**Base URL**: `http://localhost:3000/api/admin`  
+**Description**: Retrieves a list of orders with optional filters for status, district, start date, and end date. Includes detailed order information such as buyer, items, shipping address, and courier details.
+
+**Query Parameters**:  
+- `status` (optional): Filter by order status (e.g., `Shipped`, `Pending`).
+- `district` (optional): Filter by shipping district (e.g., `Puttalam`).
+- `startDate` (optional): Filter by orders created after this ISO date.
+- `endDate` (optional): Filter by orders created before this ISO date.
+
+**Example Request**:  
+```bash
+curl --location 'http://localhost:3000/api/admin/orders?status=Shipped&district=Puttalam' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZTYyMzdhMTIwOTk4NjA0OGRiODU2MCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0NDM1MjIyMiwiZXhwIjoxNzQ0MzU1ODIyfQ.-PMIYd0k51WtATVPk7lqpT-jRTELRVxvYXMHvoBiCoU'
+```
+
+**Response**:  
+```json
+{
+    "success": true,
+    "data": [
+        {
+            "shippingAddress": {
+                "street": "123 Main St",
+                "city": "Colombo",
+                "country": "Sri Lanka",
+                "postalCode": "10000",
+                "district": "Puttalam"
+            },
+            "courierDetails": {
+                "courierId": {
+                    "_id": "67f2823d2fe8a424edc522bd",
+                    "name": "sam courier",
+                    "phone": "+94770470323",
+                    "region": "Puttalam"
+                },
+                "trackingNumber": "TRK-12345"
+            },
+            "_id": "67eed9faa46e254dd61d1729",
+            "buyerId": {
+                "_id": "67e754164d954ec2d0057524",
+                "email": "buyer@example.com",
+                "name": "buyer User",
+                "phone": "+1234567890"
+            },
+            "items": [
+                {
+                    "productId": {
+                        "_id": "67eed74dc1daf109f57052ca",
+                        "title": "Toyota Camry Brake Pads",
+                        "price": 75,
+                        "condition": "New",
+                        "brand": "Bosch",
+                        "images": ["https://example.com/brake-pads.jpg"]
+                    },
+                    "quantity": 2,
+                    "price": 75,
+                    "sellerStatus": "Shipped",
+                    "_id": "67eed9faa46e254dd61d172a"
+                }
+            ],
+            "total": 150,
+            "status": "Shipped",
+            "statusHistory": [
+                {
+                    "status": "Handed over to courier service",
+                    "updatedAt": "2025-04-05T20:06:28.527Z",
+                    "_id": "67f18d4497a13a1892047b8d"
+                },
+                {
+                    "status": "Courier updated to Picked Up",
+                    "updatedAt": "2025-04-06T13:51:02.991Z",
+                    "_id": "67f286c62fe8a424edc522d5"
+                },
+                {
+                    "status": "Courier updated to Picked Up",
+                    "updatedAt": "2025-04-06T18:54:50.430Z",
+                    "_id": "67f2cdfa7d3451ffb102e68b"
+                },
+                {
+                    "status": "Delivery failed: Address not found",
+                    "updatedAt": "2025-04-06T18:55:54.423Z",
+                    "_id": "67f2ce3a7d3451ffb102e692"
+                }
+            ],
+            "createdAt": "2025-04-03T18:56:58.631Z",
+            "updatedAt": "2025-04-06T18:55:54.426Z",
+            "__v": 4,
+            "courierStatus": "Failed Delivery"
+        }
+    ]
+}
+```
+
+### **Response Fields**
+| **Field**                  | **Type**         | **Description**                                                                 |
+|----------------------------|------------------|--------------------------------------------------------------------------------|
+| `shippingAddress`          | Object           | Shipping address details.                                                      |
+| `shippingAddress.street`   | String           | Street address.                                                                |
+| `shippingAddress.city`     | String           | City.                                                                          |
+| `shippingAddress.country`  | String           | Country.                                                                       |
+| `shippingAddress.postalCode` | String        | Postal code.                                                                   |
+| `shippingAddress.district` | String           | District.                                                                      |
+| `courierDetails`           | Object           | Courier information.                                                           |
+| `courierDetails.courierId` | Object           | Courier details (ID, name, phone, region).                                     |
+| `courierDetails.trackingNumber` | String     | Tracking number for the shipment.                                              |
+| `_id`                      | String           | Order ID.                                                                      |
+| `buyerId`                  | Object           | Buyer details (ID, email, name, phone).                                        |
+| `items`                    | Array of Objects | List of items in the order.                                                    |
+| `items.productId`          | Object           | Product details (ID, title, price, condition, brand, images).                  |
+| `items.quantity`           | Number           | Quantity ordered.                                                              |
+| `items.price`              | Number           | Price per unit.                                                                |
+| `items.sellerStatus`       | String           | Seller’s status for this item (e.g., `Shipped`).                               |
+| `total`                    | Number           | Total order amount (in dollars).                                               |
+| `status`                   | String           | Current order status (e.g., `Shipped`).                                        |
+| `statusHistory`            | Array of Objects | History of status updates with timestamps.                                     |
+| `createdAt`                | String           | Order creation timestamp (ISO).                                                |
+| `updatedAt`                | String           | Last update timestamp (ISO).                                                   |
+| `courierStatus`            | String           | Current courier status (e.g., `Failed Delivery`).                              |
+
+---
+
+# **3. Admin Products API**
+
+## **Get Products**
+**Endpoint**: `GET /products`  
+**Base URL**: `http://localhost:3000/api/admin`  
+**Description**: Retrieves a list of products with optional filters for status, category, and seller ID. Includes detailed product information such as title, price, stock, and seller details.
+
+**Query Parameters**:  
+- `status` (optional): Filter by product status (e.g., `active`).
+- `category` (optional): Filter by category ID.
+- `sellerId` (optional): Filter by seller ID.
+
+**Example Request**:  
+```bash
+curl --location 'http://localhost:3000/api/admin/products?status=active&sellerId=67e754164d954ec2d0057521' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZTYyMzdhMTIwOTk4NjA0OGRiODU2MCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0NDM1MjIyMiwiZXhwIjoxNzQ0MzU1ODIyfQ.-PMIYd0k51WtATVPk7lqpT-jRTELRVxvYXMHvoBiCoU'
+```
+
+**Response**:  
+```json
+{
+    "success": true,
+    "data": [
+        {
+            "_id": "67eed74dc1daf109f57052ca",
+            "title": "Toyota Camry Brake Pads",
+            "description": "High-quality ceramic brake pads for Toyota vehicles",
+            "price": 75,
+            "category": {
+                "_id": "67e8ba893dc8d3b9b6c6665e",
+                "name": "Transmission Fluids"
+            },
+            "stock": 2,
+            "condition": "New",
+            "brand": "Bosch",
+            "oem": "OEM123",
+            "aftermarket": false,
+            "material": "Ceramic",
+            "makeModel": [
+                {
+                    "make": "Toyota",
+                    "model": "Camry",
+                    "_id": "67eed74dc1daf109f57052cb"
+                },
+                {
+                    "make": "Toyota",
+                    "model": "Corolla",
+                    "_id": "67eed74dc1daf109f57052cc"
+                }
+            ],
+            "years": [2015, 2020],
+            "availability": "In Stock",
+            "images": ["https://example.com/brake-pads.jpg"],
+            "sellerId": {
+                "_id": "67e754164d954ec2d0057521",
+                "email": "seller@example.com",
+                "name": "Updated seller"
+            },
+            "status": "active",
+            "createdAt": "2025-04-03T18:45:33.826Z",
+            "updatedAt": "2025-04-03T18:45:33.826Z",
+            "__v": 0
+        }
+    ]
+}
+```
+
+### **Response Fields**
+| **Field**         | **Type**         | **Description**                            |
+| ----------------- | ---------------- | ------------------------------------------ |
+| `_id`             | String           | Product ID.                                |
+| `title`           | String           | Product title.                             |
+| `description`     | String           | Product description.                       |
+| `price`           | Number           | Price per unit (in dollars).               |
+| `category`        | Object           | Category details (ID, name).               |
+| `stock`           | Number           | Available stock quantity.                  |
+| `condition`       | String           | Product condition (e.g., `New`).           |
+| `brand`           | String           | Product brand (e.g., `Bosch`).             |
+| `oem`             | String           | OEM number.                                |
+| `aftermarket`     | Boolean          | Indicates if the product is aftermarket.   |
+| `material`        | String           | Material of the product (e.g., `Ceramic`). |
+| `makeModel`       | Array of Objects | Compatible makes and models.               |
+| `makeModel.make`  | String           | Vehicle make (e.g., `Toyota`).             |
+| `makeModel.model` | String           | Vehicle model (e.g., `Camry`).             |
+| `years`           | Array of Numbers | Compatible years.                          |
+| `availability`    | String           | Stock availability (e.g., `In Stock`).     |
+| `images`          | Array of Strings | URLs of product images.                    |
+| `sellerId`        | Object           | Seller details (ID, email, name).          |
+| `status`          | String           | Product status (e.g., `active`).           |
+| `createdAt`       | String           | Creation timestamp (ISO).                  |
+| `updatedAt`       | String           | Last update timestamp (ISO).               |
+
+---
+
+# **4. Seller Analytics API**
+
+## **Get Seller Analytics**
+**Endpoint**: `GET /analytics`  
+**Base URL**: `http://localhost:3000/api/seller`  
+**Description**: Retrieves analytics specific to the authenticated seller, including total orders, revenue, order status breakdown, top products, and low-stock products.
+
+**Example Request**:  
+```bash
+curl --location 'http://localhost:3000/api/seller/analytics' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZTc1NDE2NGQ5NTRlYzJkMDA1NzUyMSIsInJvbGUiOiJzZWxsZXIiLCJpYXQiOjE3NDQzNTI0NzgsImV4cCI6MTc0NDM1NjA3OH0.XxkmlecTHMUuAj-Oh3h_PymO_s8cYcCmlNqy3JxXDfU'
+```
+
+**Response**:  
+```json
+{
+    "success": true,
+    "data": {
+        "totalOrders": 3,
+        "totalRevenue": 0,
+        "statusBreakdown": {
+            "Shipped": 3
+        },
+        "topProducts": [],
+        "lowStockProducts": [
+            {
+                "_id": "67eed74dc1daf109f57052ca",
+                "title": "Toyota Camry Brake Pads",
+                "stock": 2
+            }
+        ]
+    }
+}
+```
+
+### **Response Fields**
+| **Field**                | **Type**         | **Description**                                            |
+| ------------------------ | ---------------- | ---------------------------------------------------------- |
+| `totalOrders`            | Number           | Total number of orders for the seller.                     |
+| `totalRevenue`           | Number           | Total revenue from the seller’s orders (in dollars).       |
+| `statusBreakdown`        | Object           | Breakdown of orders by status (e.g., `Shipped`).           |
+| `topProducts`            | Array            | List of top-selling products (empty if no data).           |
+| `lowStockProducts`       | Array of Objects | List of products with low stock.                           |
+| `lowStockProducts._id`   | String           | Product ID.                                                |
+| `lowStockProducts.title` | String           | Product title.                                             |
+| `lowStockProducts.stock` | Number           | Current stock quantity (low threshold defined by backend). |
+
+---
+
+# **5. Courier Analytics API**
+
+## **Get Courier Analytics**
+**Endpoint**: `GET /analytics`  
+**Base URL**: `http://localhost:3000/api/courier`  
+**Description**: Retrieves analytics specific to the authenticated courier, including order status breakdown, success rate, and average delivery time.
+
+**Example Request**:  
+```bash
+curl --location 'http://localhost:3000/api/courier/analytics' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZjI4MjNkMmZlOGE0MjRlZGM1MjJiZCIsInJvbGUiOiJjb3VyaWVyIiwiaWF0IjoxNzQ0MzUyNjEwLCJleHAiOjE3NDQzNTYyMTB9.buoNIcz1ZwywbS3yrfZDRo7Gq7yUwfR6RWFRQKDmA5o'
+```
+
+**Response**:  
+```json
+{
+    "success": true,
+    "data": {
+        "statusBreakdown": {
+            "totalOrders": 2,
+            "pending": 0,
+            "pickedUp": 0,
+            "inTransit": 0,
+            "outForDelivery": 0,
+            "delivered": 1,
+            "failed": 1
+        },
+        "successRate": "50.00",
+        "averageDeliveryTime": "N/A"
+    }
+}
+```
+
+### **Response Fields**
+| **Field**                        | **Type** | **Description**                                          |
+| -------------------------------- | -------- | -------------------------------------------------------- |
+| `statusBreakdown`                | Object   | Breakdown of orders by courier status.                   |
+| `statusBreakdown.totalOrders`    | Number   | Total number of orders assigned to the courier.          |
+| `statusBreakdown.pending`        | Number   | Orders in `pending` status.                              |
+| `statusBreakdown.pickedUp`       | Number   | Orders in `pickedUp` status.                             |
+| `statusBreakdown.inTransit`      | Number   | Orders in `inTransit` status.                            |
+| `statusBreakdown.outForDelivery` | Number   | Orders in `outForDelivery` status.                       |
+| `statusBreakdown.delivered`      | Number   | Orders successfully delivered.                           |
+| `statusBreakdown.failed`         | Number   | Orders that failed delivery.                             |
+| `successRate`                    | String   | Percentage of successful deliveries (e.g., `50.00`).     |
+| `averageDeliveryTime`            | String   | Average time to deliver (e.g., `N/A` if not calculated). |
+
+---
+
+## **Error Responses (All Endpoints)**
+| Status Code | Description                | Example Response                                                  |
+| ----------- | -------------------------- | ----------------------------------------------------------------- |
+| **401**     | Unauthorized (invalid JWT) | `{"success": false, "message": "No token, authorization denied"}` |
+| **403**     | Forbidden (wrong role)     | `{"success": false, "message": "Access denied: Admins only"}`     |
+| **500**     | Server error               | `{"success": false, "message": "Internal server error"}`          |
+
+---
